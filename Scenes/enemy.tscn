@@ -2,6 +2,23 @@
 
 [ext_resource type="Script" uid="uid://b4r8n54miow7v" path="res://Scripts/Enemy1.cs" id="1_1f0kj"]
 [ext_resource type="Texture2D" uid="uid://ev7vhkcwc5eu" path="res://Assets/Enemies/soldier/Soldier.png" id="1_hghv2"]
+[ext_resource type="Script" uid="uid://b13ukf6j00a6i" path="res://Resources/DataDefinition/EnemyAttackResource.cs" id="2_0830c"]
+[ext_resource type="Script" uid="uid://dvk8o2hy13oou" path="res://Resources/DataDefinition/EnemyDefinitionData.cs" id="2_afpow"]
+[ext_resource type="Script" uid="uid://c5pnqrdfwvh5v" path="res://Resources/DataDefinition/AttacksDefinitionResource.cs" id="3_ghaa6"]
+
+[sub_resource type="Resource" id="Resource_287tu"]
+script = ExtResource("2_0830c")
+metadata/_custom_type_script = "uid://b13ukf6j00a6i"
+
+[sub_resource type="Resource" id="Resource_afpow"]
+script = ExtResource("3_ghaa6")
+attacks = Array[Object]([SubResource("Resource_287tu")])
+metadata/_custom_type_script = "uid://c5pnqrdfwvh5v"
+
+[sub_resource type="Resource" id="Resource_1f0kj"]
+script = ExtResource("2_afpow")
+Attacks = SubResource("Resource_afpow")
+metadata/_custom_type_script = "uid://dvk8o2hy13oou"
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1cquo"]
 radius = 7.0
@@ -327,13 +344,12 @@ animations = [{
 collision_layer = 4
 motion_mode = 1
 script = ExtResource("1_1f0kj")
-TileSize = null
-MoveDuration = null
+enemyData = SubResource("Resource_1f0kj")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=874393961]
 shape = SubResource("CapsuleShape2D_1cquo")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1322021001]
 sprite_frames = SubResource("SpriteFrames_1cquo")
-frame = 5
-frame_progress = 0.053194504
+frame = 42
+frame_progress = 0.14460911

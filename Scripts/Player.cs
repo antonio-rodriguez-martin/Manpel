@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public partial class Player : GridMover
 {
+    [Export] public PlayerDefinitionData Definition;
+    public PlayerState State;
     private static readonly StringName[] InputActions =
         { "ui_left", "ui_right", "ui_up", "ui_down" };
 
@@ -40,6 +42,24 @@ public partial class Player : GridMover
     private void OnMoveCompleted()
     {
         TurnManager.Instance.StartEnemyTurn();
+    }
+
+    public override bool OnMoveIntercepted(Vector2 targetWorldPos)
+    {
+        var enemy = FindEnemyAt(targetWorldPos);
+        if (enemy == null) return false;   // nothing there → normal move
+
+        BattleTransition.StartBattle(this, enemy, this);
+        return true;   // cancel the move; the battle takes over
+    }
+
+    private Enemy1 FindEnemyAt(Vector2 worldPos)
+    {
+        foreach (var n in GetTree().GetNodesInGroup("enemies"))
+            if (n is Enemy1 e &&
+                e.GlobalPosition.DistanceTo(worldPos) < TileSize * 0.5f)
+                return e;
+        return null;
     }
 
     private static Vector2 ActionToDirection(StringName action)

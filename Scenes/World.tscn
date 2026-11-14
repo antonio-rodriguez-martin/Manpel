@@ -13,6 +13,9 @@ regions = Array[Object]([ExtResource("2_gjpho"), null])
 [node name="Player" parent="." unique_id=1657417588 instance=ExtResource("1_5cjrv")]
 position = Vector2(360, 113)
 
+[node name="Camera2D2" type="Camera2D" parent="Player" unique_id=512928136]
+zoom = Vector2(3, 3)
+
 [node name="Node2D" parent="." unique_id=318713402 instance=ExtResource("2_j0p05")]
 position = Vector2(-9, 16)
 

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://clfaegfqu1msj"]
+
+[ext_resource type="PackedScene" uid="uid://bl22w16vxd3il" path="res://Scenes/Player.tscn" id="1_kv618"]
+
+[node name="CombatScene" type="Node2D" unique_id=422745843]
+
+[node name="Player" parent="." unique_id=1657417588 instance=ExtResource("1_kv618")]
+position = Vector2(69, 99)
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=872262830]
+
+[node name="EnemyReference" type="Node2D" parent="." unique_id=308919548]

@@ -788,7 +788,8 @@ shape = SubResource("RectangleShape2D_1cquo")
 [node name="Enemy" parent="." unique_id=987591978 instance=ExtResource("3_d3x0h")]
 z_index = 4
 position = Vector2(512, 106)
+collision_mask = 3
 
 [node name="Enemy2" parent="." unique_id=2103057481 instance=ExtResource("3_d3x0h")]
 z_index = 4
-position = Vector2(370, 40)
+position = Vector2(456, 37)

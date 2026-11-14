@@ -47,4 +47,10 @@ public partial class TurnManager : Node
         if (_pendingEnemies <= 0)
             CurrentPhase = Phase.PlayerTurn;
     }
+
+    public void  ResetToPlayerTurn()
+    {
+        _pendingEnemies = 0;
+        CurrentPhase = Phase.PlayerTurn;
+    }
 }
