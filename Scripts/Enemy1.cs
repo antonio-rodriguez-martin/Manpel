@@ -17,7 +17,7 @@ public partial class Enemy1 : GridMover
 
         if (player.GlobalPosition.DistanceTo(targetWorldPos) < TileSize * 0.5f)
         {
-            BattleTransition.StartBattle(this, this, player);
+            CombatTransition.Instance.StartBattle(player, this);
             return true;
         }
         return false;

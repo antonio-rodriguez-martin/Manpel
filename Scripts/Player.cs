@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public partial class Player : GridMover
 {
     [Export] public PlayerDefinitionData Definition;
+    [Export] public AnimatedSprite2D AnimSprite;
 
     public bool CanMove = true;
     public PlayerState State;
@@ -25,6 +26,7 @@ public partial class Player : GridMover
 
     public override void _PhysicsProcess(double delta)
     {
+        AnimSprite.Play("Idle");
         base._PhysicsProcess(delta);
 
         if (!CanMove) return;
@@ -49,16 +51,17 @@ public partial class Player : GridMover
 
     private void OnMoveCompleted() => TurnManager.Instance.StartEnemyTurn();
 
-    public override bool OnMoveIntercepted(Vector2 targetWorldPos)
+   public override bool OnMoveIntercepted(Vector2 targetWorldPos)
+{
+    Enemy1 enemy = FindEnemyAt(targetWorldPos);
+    if (enemy != null)
     {
-        Enemy1 enemy = FindEnemyAt(targetWorldPos);
-        if (enemy != null)
-        {
-            BattleTransition.StartBattle(this, enemy, this);
-            return true;
-        }
-        return false;
+        // Call the Autoload directly
+        CombatTransition.Instance.StartBattle(this, enemy);
+        return true; 
     }
+    return false;
+} 
 
     private Enemy1 FindEnemyAt(Vector2 worldPos)
     {

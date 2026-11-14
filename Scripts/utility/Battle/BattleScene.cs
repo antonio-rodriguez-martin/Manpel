@@ -13,6 +13,10 @@ public partial class BattleScene : Node2D
     [Export] public Label       EnemyHPLabel;
     [Export] public Container   AttackButtons;
 
+    [Export] public Control OutcomePanel;
+    [Export] public Label   OutcomeTitle;
+    [Export] public Button  ContinueButton;
+
     private BattleState _state = BattleState.Busy;
     private PlayerState _playerState;
     private EnemyDefinitionData _enemyDef;
@@ -23,15 +27,26 @@ public partial class BattleScene : Node2D
     private int _currentPlayerHp;
     private int _currentEnemyHp;
 
+    private Node _playerOriginalParent;
+    private Vector2 _playerOriginalPos;
+    private Node _enemyOriginalParent;
+    private Vector2 _enemyOriginalPos;
+
     public void Initialize(Player playerNode, Enemy1 mapEnemy, Node2D mapScene)
     {
-        _playerNode  = playerNode;
+        _playerNode = playerNode;
         _playerState = playerNode.State ?? new PlayerState(playerNode.Definition);
         _playerNode.State = _playerState;
 
         _mapEnemy = mapEnemy;
         _enemyDef = mapEnemy.enemyData;
         _mapScene = mapScene;
+
+        // Capture BEFORE BattleTransition reparents them.
+        _playerOriginalParent = playerNode.GetParent();
+        _playerOriginalPos    = playerNode.Position;
+        _enemyOriginalParent  = mapEnemy.GetParent();
+        _enemyOriginalPos     = mapEnemy.Position;
 
         _currentPlayerHp = _playerState.CurrentHP;
         _currentEnemyHp  = _enemyDef.MaxHP;
@@ -51,6 +66,7 @@ public partial class BattleScene : Node2D
     }
 
     // ─── Player turn ─────────────────────────────────────────────────────
+
     private void StartPlayerTurn()
     {
         _state = BattleState.PlayerTurn;
@@ -76,7 +92,7 @@ public partial class BattleScene : Node2D
         {
             _state = BattleState.Victory;
             SetMessage($"{_enemyDef.DisplayName} was defeated!");
-            await ToSignal(GetTree().CreateTimer(1.0), SceneTreeTimer.SignalName.Timeout);
+            await ShowOutcome(true);
             EndBattle(true);
             return;
         }
@@ -103,7 +119,7 @@ public partial class BattleScene : Node2D
         {
             _state = BattleState.Defeat;
             SetMessage("You were defeated...");
-            await ToSignal(GetTree().CreateTimer(1.5), SceneTreeTimer.SignalName.Timeout);
+            await ShowOutcome(false);
             EndBattle(false);
             return;
         }
@@ -151,8 +167,16 @@ public partial class BattleScene : Node2D
     private void SetButtonsEnabled(bool enabled)
     {
         if (AttackButtons == null) return;
+        Button first = null;
         foreach (var c in AttackButtons.GetChildren())
-            if (c is Button b) b.Disabled = !enabled;
+        {
+            if (c is Button b)
+            {
+                b.Disabled = !enabled;
+                if (enabled && first == null) first = b;
+            }
+        }
+        if (enabled && first != null) first.GrabFocus();
     }
 
     private void SetMessage(string text)
@@ -183,16 +207,44 @@ public partial class BattleScene : Node2D
     public void EndBattle(bool playerWon)
     {
         _playerState.CurrentHP = _currentPlayerHp;
-        BattleTransition.BattleEnd(_playerNode);
 
-        if (playerWon && IsInstanceValid(_mapEnemy))
-            _mapEnemy.QueueFree();
+        // Player always comes back to the overworld.
+        if (IsInstanceValid(_playerNode))
+        {
+            _playerNode.Reparent(_playerOriginalParent, false);
+            _playerNode.Position = _playerOriginalPos;
+            _playerNode.SetPhysicsProcess(true);
+        }
+
+        // Enemy: free on victory, return on defeat.
+        if (IsInstanceValid(_mapEnemy))
+        {
+            if (playerWon)
+                _mapEnemy.QueueFree();
+            else
+            {
+                _mapEnemy.Reparent(_enemyOriginalParent, false);
+                _mapEnemy.Position = _enemyOriginalPos;
+                _mapEnemy.SetPhysicsProcess(true);
+            }
+        }
 
         _mapScene.ProcessMode = Node.ProcessModeEnum.Inherit;
         _mapScene.Visible = true;
         GetTree().CurrentScene = _mapScene;
 
         TurnManager.Instance?.ResetToPlayerTurn();
-        QueueFree();
+        BattleTransition.BattleEnd(_playerNode);   // CanMove = true
+        QueueFree(); 
+    }
+
+    private async Task<bool> ShowOutcome(bool playerWon)
+    {
+        OutcomeTitle.Text = playerWon ? "Victory!" : "Defeat...";
+        OutcomePanel.Visible = true;
+        ContinueButton.GrabFocus();
+        await ToSignal(ContinueButton, Button.SignalName.Pressed);
+        OutcomePanel.Visible = false;
+        return true;
     }
 }
