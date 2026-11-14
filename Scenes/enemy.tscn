@@ -51,10 +51,12 @@ script = ExtResource("1_1f0kj")
 enemyData = SubResource("Resource_1f0kj")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=874393961]
+rotation = 1.4887658
+scale = Vector2(3.925, 3.925)
 shape = SubResource("CapsuleShape2D_1cquo")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1322021001]
-position = Vector2(4.0000005, 0)
-scale = Vector2(0.045, 0.045)
+position = Vector2(14, 0)
+scale = Vector2(0.19, 0.19)
 sprite_frames = SubResource("SpriteFrames_1cquo")
 animation = &"idle"

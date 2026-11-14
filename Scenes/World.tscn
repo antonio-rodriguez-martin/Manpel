@@ -15,7 +15,7 @@ regions = Array[Object]([ExtResource("2_gjpho"), null])
 SoundPlayer = NodePath("AudioStreamPlayer")
 
 [node name="Player" parent="." unique_id=1657417588 instance=ExtResource("1_5cjrv")]
-position = Vector2(345, 102)
+position = Vector2(96, 96)
 Definition = ExtResource("4_45d1s")
 
 [node name="Map" parent="." unique_id=318713402 instance=ExtResource("2_j0p05")]

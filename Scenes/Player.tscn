@@ -10,23 +10,18 @@
 [sub_resource type="Resource" id="Resource_52ee3"]
 script = ExtResource("2_nn08x")
 Damage = 15
-attackType = 3
+attackType = 1
 metadata/_custom_type_script = "uid://b13ukf6j00a6i"
 
 [sub_resource type="Resource" id="Resource_bhhdu"]
 script = ExtResource("2_nn08x")
 Damage = 20
-attackType = 1
-metadata/_custom_type_script = "uid://b13ukf6j00a6i"
-
-[sub_resource type="Resource" id="Resource_nn08x"]
-script = ExtResource("2_nn08x")
-attackType = 2
+attackType = 3
 metadata/_custom_type_script = "uid://b13ukf6j00a6i"
 
 [sub_resource type="Resource" id="Resource_megsn"]
 script = ExtResource("3_52ee3")
-attacks = Array[ExtResource("2_nn08x")]([SubResource("Resource_52ee3"), SubResource("Resource_bhhdu"), SubResource("Resource_nn08x")])
+attacks = Array[ExtResource("2_nn08x")]([SubResource("Resource_52ee3"), SubResource("Resource_bhhdu")])
 metadata/_custom_type_script = "uid://c5pnqrdfwvh5v"
 
 [sub_resource type="Resource" id="Resource_gntrk"]
@@ -36,8 +31,8 @@ Attacks = SubResource("Resource_megsn")
 metadata/_custom_type_script = "uid://cqodmjbr84dfo"
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1cquo"]
-radius = 5.0
-height = 14.0
+radius = 9.380729
+height = 18.761457
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rpqav"]
 animations = [{
@@ -60,6 +55,7 @@ animations = [{
 
 [node name="Player" type="CharacterBody2D" unique_id=1657417588 node_paths=PackedStringArray("AnimSprite")]
 z_index = 10
+scale = Vector2(2.645, 2.645)
 collision_layer = 2
 collision_mask = 9
 script = ExtResource("1_gntrk")
@@ -76,4 +72,3 @@ sprite_frames = SubResource("SpriteFrames_rpqav")
 animation = &"Idle"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=656564996]
-zoom = Vector2(2.5, 2.5)

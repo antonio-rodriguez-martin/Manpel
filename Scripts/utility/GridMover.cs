@@ -5,7 +5,7 @@ public partial class GridMover : CharacterBody2D
 {
     [Signal] public delegate void MoveCompletedEventHandler();
 
-    public const float TileSize = 16f;        // tamaño del tile en píxeles
+    public const float TileSize = 128f;        // tamaño del tile en píxeles
     public const float MoveDuration = 0.2f;   // segundos por casilla
 
     private bool _isMoving;

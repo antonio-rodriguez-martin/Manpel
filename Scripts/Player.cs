@@ -52,16 +52,15 @@ public partial class Player : GridMover
     private void OnMoveCompleted() => TurnManager.Instance.StartEnemyTurn();
 
    public override bool OnMoveIntercepted(Vector2 targetWorldPos)
-{
-    Enemy1 enemy = FindEnemyAt(targetWorldPos);
-    if (enemy != null)
     {
-        // Call the Autoload directly
-        CombatTransition.Instance.StartBattle(this, enemy);
-        return true; 
-    }
-    return false;
-} 
+        Enemy1 enemy = FindEnemyAt(targetWorldPos);
+        if (enemy != null)
+        {
+            CombatTransition.Instance.StartBattle(this, enemy);
+            return true; 
+        }
+        return false;
+    } 
 
     private Enemy1 FindEnemyAt(Vector2 worldPos)
     {

@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://clfaegfqu1msj"]
 
 [ext_resource type="Script" uid="uid://c8hdyntk0qg5e" path="res://Scripts/utility/Battle/CombatScene.cs" id="1_7uj85"]
+[ext_resource type="Texture2D" uid="uid://d238a305b8b0i" path="res://Assets/steppes.png" id="2_2ip8y"]
 [ext_resource type="Texture2D" uid="uid://bcgp1trpmf0kx" path="res://Assets/Player/Manpel_V1.png" id="4_2ip8y"]
-[ext_resource type="Texture2D" uid="uid://bx2m1q631lee3" path="res://Assets/two-large-moons-illuminate-a-mountain-landscape-at-dusk-photo.webp" id="4_7uj85"]
 [ext_resource type="Script" uid="uid://bu56o0orcqamk" path="res://Scripts/utility/Battle/CombatManager.cs" id="5_2ip8y"]
 [ext_resource type="Texture2D" uid="uid://dkphdmvvl47h" path="res://Assets/Enemies/pitagma/Pitagma_V1.png" id="5_vtehv"]
 
@@ -28,7 +28,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="CombatScene" type="Node2D" unique_id=422745843 node_paths=PackedStringArray("MessageLabel", "PlayerHPBar", "EnemyHPBar", "PlayerHPLabel", "EnemyHPLabel", "AttackButtons", "OutcomePanel", "OutcomeTitle", "ContinueButton")]
+[node name="CombatScene" type="Node2D" unique_id=422745843 node_paths=PackedStringArray("MessageLabel", "PlayerHPBar", "EnemyHPBar", "PlayerHPLabel", "EnemyHPLabel", "AttackButtons", "OutcomePanel", "OutcomeTitle", "ContinueButton", "PlayerVisual", "EnemyVisual")]
 script = ExtResource("1_7uj85")
 MessageLabel = NodePath("UI/MessageLabel")
 PlayerHPBar = NodePath("UI/PlayerHpBar")
@@ -39,10 +39,13 @@ AttackButtons = NodePath("UI/AttackButtons")
 OutcomePanel = NodePath("UI/OutComePanel")
 OutcomeTitle = NodePath("UI/OutComePanel/OutComeTitle")
 ContinueButton = NodePath("UI/OutComePanel/ContinueButton")
+PlayerVisual = NodePath("Player")
+EnemyVisual = NodePath("Enemy")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1841624582]
-position = Vector2(253, 142.5)
-texture = ExtResource("4_7uj85")
+position = Vector2(303, 66.99999)
+scale = Vector2(0.615, 0.615)
+texture = ExtResource("2_2ip8y")
 
 [node name="CombatManager" type="Node" parent="." unique_id=1168859740]
 script = ExtResource("5_2ip8y")
