@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 public partial class TurnManager : Node
@@ -7,6 +8,8 @@ public partial class TurnManager : Node
     public static TurnManager Instance { get; private set; }
 
     public Phase CurrentPhase { get; private set; } = Phase.PlayerTurn;
+
+    public readonly HashSet<Vector2I> ReservedCells = new();
 
     private int _pendingEnemies;
 
@@ -19,7 +22,9 @@ public partial class TurnManager : Node
 
     public void StartEnemyTurn()
     {
-        _pendingEnemies = GetTree().GetNodesInGroup("enemies").Count;
+        //NOTE(ullr): Crear un grupo en la GUI de godot y añadirlos al grupo enemies
+        var enemies = GetTree().GetNodesInGroup("enemies");
+        _pendingEnemies = enemies.Count;
 
         if (_pendingEnemies == 0)
         {
@@ -29,6 +34,10 @@ public partial class TurnManager : Node
         }
 
         CurrentPhase = Phase.EnemyTurn;
+        ReservedCells.Clear();
+
+        foreach (var n in enemies)
+            ReservedCells.Add(GridMath.WorldToCell(((Node2D)n).GlobalPosition));
         EmitSignal(SignalName.EnemyTurnStarted);
     }
 

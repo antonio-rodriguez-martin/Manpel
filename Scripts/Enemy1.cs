@@ -9,40 +9,53 @@ public partial class Enemy1 : GridMover
         TurnManager.Instance.EnemyTurnStarted += OnEnemyTurn;
     }
 
-    private void OnEnemyTurn()
+ private void OnEnemyTurn()
     {
-        if (RuntimeDataSpace.RuntimeData.player == null)
+        var player = RuntimeDataSpace.RuntimeData.player;
+        if (player == null) { Finish(); return; }
+
+        var myCell     = GridMath.WorldToCell(GlobalPosition);
+        var playerCell = GridMath.WorldToCell(player.GlobalPosition);
+
+        var delta = playerCell - myCell;
+        if (Mathf.Abs(delta.X) + Mathf.Abs(delta.Y) == 1)
         {
-            TurnManager.Instance.EnemyFinishedMoving();
+            // TODO: transicion a batalla
+            Finish();
             return;
         }
 
-        Vector2 toPlayer = RuntimeDataSpace.RuntimeData.player.GlobalPosition - GlobalPosition;
+        var step = Pathfinder.FindNextStep(myCell, playerCell, IsBlockedForPathing);
+        if (step == Vector2I.Zero) { Finish(); return; }
 
-        // ¿Ya está sobre el jugador? (bump attack)
-        if (Mathf.Abs(toPlayer.X) < TileSize * 0.5f &&
-            Mathf.Abs(toPlayer.Y) < TileSize * 0.5f)
+        var dest = myCell + step;
+
+        if (dest == playerCell)
         {
-            // Aquí iría el ataque. Por ahora, no hacemos nada.
-            TurnManager.Instance.EnemyFinishedMoving();
+            // TODO(ullr): transicion a batalla
+            Finish();
             return;
         }
 
-        Vector2 dir;
-        if (Mathf.Abs(toPlayer.X) >= Mathf.Abs(toPlayer.Y))
-            dir = new Vector2(Mathf.Sign(toPlayer.X), 0);
-        else
-            dir = new Vector2(0, Mathf.Sign(toPlayer.Y));
-
-        if (!TryMove(dir))
+        if (!TurnManager.Instance.ReservedCells.Add(dest))
         {
-            // Bloqueado (pared, etc.): termina su turno igualmente.
-            TurnManager.Instance.EnemyFinishedMoving();
+            Finish(); 
+            return;
         }
+
+        if (!TryMove(new Vector2(step.X, step.Y)))
+            Finish();
     }
 
-    private void OnMoveCompleted()
+    private bool IsBlockedForPathing(Vector2I cell)
     {
-        TurnManager.Instance.EnemyFinishedMoving();
+        if (TurnManager.Instance.ReservedCells.Contains(cell))
+            return true;
+
+        return IsTileBlocked(GridMath.CellToWorld(cell));
     }
+
+    private void Finish() => TurnManager.Instance.EnemyFinishedMoving();
+    private void OnMoveCompleted() => Finish();
+
 }

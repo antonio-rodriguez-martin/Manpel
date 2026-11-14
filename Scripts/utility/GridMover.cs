@@ -19,6 +19,7 @@ public partial class GridMover : CharacterBody2D
 
         _targetPosition = GlobalPosition + direction * TileSize;
 
+        if (IsTileBlocked(_targetPosition)) return false;
         _isMoving = true;
         return true;
     }
@@ -30,16 +31,16 @@ public partial class GridMover : CharacterBody2D
         float speed = TileSize / MoveDuration; // px/s
         GlobalPosition = GlobalPosition.MoveToward(_targetPosition, speed * (float)delta);
 
+
         if (GlobalPosition.DistanceTo(_targetPosition) < 0.1f)
         {
             GlobalPosition = _targetPosition;
             _isMoving = false;
             EmitSignal(SignalName.MoveCompleted);
-
         }
     }
 
-    private bool IsTileBlocked(Vector2 worldPosition)
+    public bool IsTileBlocked(Vector2 worldPosition)
     {
         var space = GetWorld2D().DirectSpaceState;
         var query = new PhysicsPointQueryParameters2D
@@ -47,13 +48,12 @@ public partial class GridMover : CharacterBody2D
             Position = worldPosition,
             CollisionMask = 1
         };
-        query.CollideWithBodies = true;
         var hits = space.IntersectPoint(query);
 
         foreach (var hit in hits)
         {
-            var collider = hit["collider"].As<GodotObject>();
-            if (collider != this)         // ignora al propio enemigo
+            var body = hit["collider"].As<GodotObject>();
+            if (body != this && body != GetParent())
                 return true;
         }
         return false;
