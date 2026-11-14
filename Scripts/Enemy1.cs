@@ -2,11 +2,25 @@ using Godot;
 
 public partial class Enemy1 : GridMover
 {
+    [Export] public EnemyDefinitionData enemyData;
     public override void _Ready()
     {
         AddToGroup("enemies");
         MoveCompleted += OnMoveCompleted;
         TurnManager.Instance.EnemyTurnStarted += OnEnemyTurn;
+    }
+
+    public override bool OnMoveIntercepted(Vector2 targetWorldPos)
+    {
+        var player = RuntimeDataSpace.RuntimeData.player;
+        if (player == null) return false;
+
+        if (player.GlobalPosition.DistanceTo(targetWorldPos) < TileSize * 0.5f)
+        {
+            CombatTransition.Instance.StartBattle(player, this);
+            return true;
+        }
+        return false;
     }
 
  private void OnEnemyTurn()
@@ -17,34 +31,17 @@ public partial class Enemy1 : GridMover
         var myCell     = GridMath.WorldToCell(GlobalPosition);
         var playerCell = GridMath.WorldToCell(player.GlobalPosition);
 
-        var delta = playerCell - myCell;
-        if (Mathf.Abs(delta.X) + Mathf.Abs(delta.Y) == 1)
-        {
-            // TODO: transicion a batalla
-            Finish();
-            return;
-        }
-
         var step = Pathfinder.FindNextStep(myCell, playerCell, IsBlockedForPathing);
         if (step == Vector2I.Zero) { Finish(); return; }
 
         var dest = myCell + step;
 
-        if (dest == playerCell)
-        {
-            // TODO(ullr): transicion a batalla
-            Finish();
-            return;
-        }
+        // Reserve (see previous answer) then try to move.
+        if (!TurnManager.Instance.ReservedCells.Add(dest)) { Finish(); return; }
 
-        if (!TurnManager.Instance.ReservedCells.Add(dest))
-        {
-            Finish(); 
-            return;
-        }
-
+        // TryMove → OnMoveIntercepted fires → battle may start here.
         if (!TryMove(new Vector2(step.X, step.Y)))
-            Finish();
+            Finish(); 
     }
 
     private bool IsBlockedForPathing(Vector2I cell)
@@ -58,4 +55,11 @@ public partial class Enemy1 : GridMover
     private void Finish() => TurnManager.Instance.EnemyFinishedMoving();
     private void OnMoveCompleted() => Finish();
 
+    public override void _ExitTree()
+    {
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.EnemyTurnStarted -= OnEnemyTurn;
+        }
+    }
 }

@@ -2,8 +2,8 @@ using Godot;
 
 public static class GridMath
 {
-    public const float TileSize = 16f;
-    public const float MoveDuration = 0.2f;
+    public const float TileSize = 128f;
+    public const float MoveDuration = 0.3f;
 
     public static Vector2I WorldToCell(Vector2 world) =>
         new Vector2I(Mathf.FloorToInt(world.X / TileSize),

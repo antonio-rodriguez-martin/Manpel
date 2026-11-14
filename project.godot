@@ -15,6 +15,10 @@ run/main_scene="uid://2osckyn277sn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+CombatTransition="*uid://doy1xsxlf3lxp"
+
 [display]
 
 window/stretch/mode="canvas_items"
@@ -23,6 +27,10 @@ window/stretch/aspect="expand"
 [dotnet]
 
 project/assembly_name="Manpel"
+
+[editor]
+
+version_control/autoload_on_startup=true
 
 [input]
 
