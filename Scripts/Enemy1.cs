@@ -55,4 +55,11 @@ public partial class Enemy1 : GridMover
     private void Finish() => TurnManager.Instance.EnemyFinishedMoving();
     private void OnMoveCompleted() => Finish();
 
+    public override void _ExitTree()
+    {
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.EnemyTurnStarted -= OnEnemyTurn;
+        }
+    }
 }

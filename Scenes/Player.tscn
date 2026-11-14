@@ -705,3 +705,6 @@ shape = SubResource("CapsuleShape2D_1cquo")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1025533183]
 sprite_frames = SubResource("SpriteFrames_1cquo")
 animation = &"Walk"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=656564996]
+zoom = Vector2(1.8, 1.8)

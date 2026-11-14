@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://8bdq6g7b7nr6" path="res://Scripts/WorldGenerator.cs" id="1_5nsto"]
 [ext_resource type="Resource" uid="uid://cspghl4uyg7hr" path="res://Resources/map1_region1.tres" id="2_gjpho"]
 [ext_resource type="PackedScene" uid="uid://dwqxi6825k63n" path="res://Scenes/map1.tscn" id="2_j0p05"]
+[ext_resource type="Resource" uid="uid://dkk26mdi3l7hj" path="res://Resources/PlayerDefinition/PlayerDefinition.tres" id="4_45d1s"]
 [ext_resource type="Script" uid="uid://5cuen6ct08fr" path="res://Scripts/utility/TurnManager.cs" id="5_p70al"]
 
 [node name="World" type="Node2D" unique_id=1722741833]
@@ -12,9 +13,7 @@ regions = Array[Object]([ExtResource("2_gjpho"), null])
 
 [node name="Player" parent="." unique_id=1657417588 instance=ExtResource("1_5cjrv")]
 position = Vector2(360, 113)
-
-[node name="Camera2D2" type="Camera2D" parent="Player" unique_id=512928136]
-zoom = Vector2(3, 3)
+Definition = ExtResource("4_45d1s")
 
 [node name="Node2D" parent="." unique_id=318713402 instance=ExtResource("2_j0p05")]
 position = Vector2(-9, 16)

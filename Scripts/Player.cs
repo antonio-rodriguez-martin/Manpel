@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public partial class Player : GridMover
 {
     [Export] public PlayerDefinitionData Definition;
+
+    public bool CanMove = true;
     public PlayerState State;
     private static readonly StringName[] InputActions =
         { "ui_left", "ui_right", "ui_up", "ui_down" };
@@ -13,6 +15,11 @@ public partial class Player : GridMover
     public override void _Ready()
     {
         RuntimeDataSpace.RuntimeData.player = this;
+
+        // Initialize state once (or load from save later)
+        if (State == null)
+            State = new PlayerState(Definition);
+
         MoveCompleted += OnMoveCompleted;
     }
 
@@ -20,6 +27,7 @@ public partial class Player : GridMover
     {
         base._PhysicsProcess(delta);
 
+        if (!CanMove) return;
         if (IsMoving) return;
         if (TurnManager.Instance.CurrentPhase != TurnManager.Phase.PlayerTurn) return;
 
@@ -39,25 +47,23 @@ public partial class Player : GridMover
         TryMove(dir);
     }
 
-    private void OnMoveCompleted()
-    {
-        TurnManager.Instance.StartEnemyTurn();
-    }
+    private void OnMoveCompleted() => TurnManager.Instance.StartEnemyTurn();
 
     public override bool OnMoveIntercepted(Vector2 targetWorldPos)
     {
-        var enemy = FindEnemyAt(targetWorldPos);
-        if (enemy == null) return false;   // nothing there → normal move
-
-        BattleTransition.StartBattle(this, enemy, this);
-        return true;   // cancel the move; the battle takes over
+        Enemy1 enemy = FindEnemyAt(targetWorldPos);
+        if (enemy != null)
+        {
+            BattleTransition.StartBattle(this, enemy, this);
+            return true;
+        }
+        return false;
     }
 
     private Enemy1 FindEnemyAt(Vector2 worldPos)
     {
         foreach (var n in GetTree().GetNodesInGroup("enemies"))
-            if (n is Enemy1 e &&
-                e.GlobalPosition.DistanceTo(worldPos) < TileSize * 0.5f)
+            if (n is Enemy1 e && e.GlobalPosition.DistanceTo(worldPos) < TileSize * 0.5f)
                 return e;
         return null;
     }

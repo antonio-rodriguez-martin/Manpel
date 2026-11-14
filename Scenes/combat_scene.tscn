@@ -1,12 +1,56 @@
 [gd_scene format=3 uid="uid://clfaegfqu1msj"]
 
 [ext_resource type="PackedScene" uid="uid://bl22w16vxd3il" path="res://Scenes/Player.tscn" id="1_kv618"]
+[ext_resource type="Script" uid="uid://d4nmc0vy8iug4" path="res://Scripts/utility/Battle/BattleScene.cs" id="1_qumoa"]
+[ext_resource type="PackedScene" uid="uid://pnntr070wcph" path="res://Scenes/enemy.tscn" id="3_rdqa8"]
 
-[node name="CombatScene" type="Node2D" unique_id=422745843]
+[node name="CombatScene" type="Node2D" unique_id=422745843 node_paths=PackedStringArray("MessageLabel", "PlayerHPBar", "EnemyHPBar", "PlayerHPLabel", "EnemyHPLabel", "AttackButtons")]
+script = ExtResource("1_qumoa")
+MessageLabel = NodePath("PlayerName")
+PlayerHPBar = NodePath("PlayerHealth")
+EnemyHPBar = NodePath("EnemyHealth")
+PlayerHPLabel = NodePath("EnemyName")
+EnemyHPLabel = NodePath("EnemyName")
+AttackButtons = NodePath("Menu")
+
+[node name="PlayerName" type="Label" parent="." unique_id=1176416772]
+offset_left = 102.0
+offset_top = -6.0
+offset_right = 163.0
+offset_bottom = 17.0
+text = "Enemy"
+
+[node name="EnemyName" type="Label" parent="." unique_id=1741663576]
+offset_left = -26.0
+offset_top = -5.0
+offset_right = 32.0
+offset_bottom = 18.0
+text = "Manpel"
+
+[node name="PlayerHealth" type="ProgressBar" parent="." unique_id=1843584777]
+offset_left = -41.0
+offset_top = -40.0
+offset_right = 49.0
+offset_bottom = -13.0
+
+[node name="EnemyHealth" type="ProgressBar" parent="." unique_id=1333482195]
+offset_left = 99.0
+offset_top = -44.0
+offset_right = 168.0
+offset_bottom = -17.0
+
+[node name="Menu" type="Container" parent="." unique_id=265209082]
+offset_left = -104.0
+offset_top = 27.0
+offset_right = -1.0
+offset_bottom = 67.0
 
 [node name="Player" parent="." unique_id=1657417588 instance=ExtResource("1_kv618")]
-position = Vector2(69, 99)
+position = Vector2(2, 54)
+script = null
 
-[node name="Camera2D" type="Camera2D" parent="Player" unique_id=872262830]
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=578430491]
 
-[node name="EnemyReference" type="Node2D" parent="." unique_id=308919548]
+[node name="Enemy" parent="." unique_id=987591978 instance=ExtResource("3_rdqa8")]
+position = Vector2(134, 53)
+script = null
