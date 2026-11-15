@@ -6,9 +6,9 @@ public partial class CombatScene : Node2D
 {
     [Export] public Label MessageLabel;
     [Export] public ProgressBar PlayerHPBar;
-    [Export] public ProgressBar PlayerMPBar;
+    //[Export] public ProgressBar PlayerMPBar;
     [Export] public ProgressBar EnemyHPBar;
-    //[Export] public Label PlayerHPLabel;
+    [Export] public Label PlayerHPLabel;
     //[Export] public Label PlayerMPLabel;
     [Export] public Label EnemyHPLabel;
     [Export] public Container AttackButtons;
@@ -24,6 +24,12 @@ public partial class CombatScene : Node2D
     [Export] public float JumpHangTime = 0.30f;
     [Export] public float JumpDescentTime = 0.22f;
     
+    [Export] public AnimatedSprite2D EnemyAttackEffect; 
+
+    private AnimatedSprite2D _enemySprite;
+    private Vector2 _playerHomePos;
+    private Vector2 _enemyHomePos;
+
     private int JumpNum;
     private CombatManager _manager;
 
@@ -51,11 +57,22 @@ public partial class CombatScene : Node2D
         _manager.HealthUpdated += OnHealthUpdated;
         _manager.MessageUpdated += OnMessageUpdated;
 
-        PlayerVisual ??= GetNodeOrNull<Node2D>("Player")
-                         ?? FindChild("Player", true, false) as Node2D;
-        EnemyVisual  ??= GetNodeOrNull<Node2D>("EnemyAttackReference")
-                         ?? GetNodeOrNull<Node2D>("Enemy")
-                         ?? FindChild("Enemy*", true, false) as Node2D;
+        PlayerVisual ??= GetNodeOrNull<Node2D>("Player") ?? FindChild("Player", true, false) as Node2D;
+        EnemyVisual  ??= GetNodeOrNull<Node2D>("EnemyAttackReference") ?? GetNodeOrNull<Node2D>("Enemy") ?? FindChild("Enemy*", true, false) as Node2D;
+
+        // Cache the exact starting positions so we always return to them
+        if (PlayerVisual != null) _playerHomePos = PlayerVisual.Position;
+        if (EnemyVisual != null) _enemyHomePos = EnemyVisual.Position;
+
+        // Find the enemy body sprite (for playing idle/attack animations)
+        if (EnemyVisual is AnimatedSprite2D sprite)
+            _enemySprite = sprite;
+        else if (EnemyVisual != null)
+            _enemySprite = EnemyVisual.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D") ?? EnemyVisual.FindChild("*", true, false) as AnimatedSprite2D;
+
+        // Hide the attack effect until it's needed
+        if (EnemyAttackEffect != null) 
+            EnemyAttackEffect.Visible = false;
 
         CreateJumpTimingIndicator();
 
@@ -73,18 +90,15 @@ public partial class CombatScene : Node2D
         if (_canPlayerJump && !_isPlayerJumping && Input.IsActionJustPressed("ui_accept") && JumpNum > 0)
         {
             if (!_isJumpWindowSweetSpot)
-            {
                 ShowCueFeedback("TOO EARLY!", new Color(1f, 0.45f, 0.2f));
-            }
             else
-            {
                 ShowCueFeedback("JUMP!", new Color(0.3f, 1f, 0.9f));
-            }
 
             _ = PerformPlayerJumpAsync();
             JumpNum = 0;
         }
     }
+
 
     private void CreateJumpTimingIndicator()
     {
@@ -135,31 +149,46 @@ public partial class CombatScene : Node2D
         _jumpCueLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
         _jumpCueLabel.AddThemeConstantOverride("outline_size", 5);
         _jumpCueRoot.AddChild(_jumpCueLabel);
+
+        _jumpCueRoot = new Node2D { Name = "JumpTimingIndicator", ZIndex = 20, Visible = false };
+        AddChild(_jumpCueRoot);
+        _barBg = new ColorRect { Color = new Color(0.12f, 0.12f, 0.15f, 0.9f), Position = new Vector2(-BarTotalWidth * 0.5f, 0), Size = new Vector2(BarTotalWidth, BarHeight) };
+        _jumpCueRoot.AddChild(_barBg);
+        _barSweetSpot = new ColorRect { Color = new Color(0.15f, 0.85f, 0.3f, 0.85f), Position = new Vector2((BarTotalWidth * 0.5f) - sweetSpotWidth, 0), Size = new Vector2(sweetSpotWidth, BarHeight) };
+        _jumpCueRoot.AddChild(_barSweetSpot);
+        _barFill = new ColorRect { Color = new Color(1f, 0.85f, 0.2f, 0.95f), Position = new Vector2(-BarTotalWidth * 0.5f, 2), Size = new Vector2(0, BarHeight - 4) };
+        _jumpCueRoot.AddChild(_barFill);
+        _jumpCueLabel = new Label { Text = "! WAIT...", HorizontalAlignment = HorizontalAlignment.Center, Position = new Vector2(-90, -28), CustomMinimumSize = new Vector2(180, 24) };
+        _jumpCueLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.2f));
+        _jumpCueLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+        _jumpCueLabel.AddThemeConstantOverride("outline_size", 5);
+        _jumpCueRoot.AddChild(_jumpCueLabel);
     }
 
-    private void ShowCueFeedback(string text, Color color)
+     private void ShowCueFeedback(string text, Color color)
     {
         if (_jumpCueLabel == null) return;
         _jumpCueLabel.Text = text;
         _jumpCueLabel.AddThemeColorOverride("font_color", color);
     }
 
-    public async Task<bool> PlayAttackSequenceAsync(CombatAction action)
-    {
-        if (action.IsPlayerAction)
-            return await PlayPlayerAttackSequenceAsync(action);
-        else
-            return await PlayEnemyAttackSequenceAsync(action);
-    }
+    // ─── PLAYER ATTACKS ENEMY ─────────────────────────────────────────────
 
-    private async Task<bool> PlayPlayerAttackSequenceAsync(CombatAction action)
+    public async Task<bool> PlayAttackSequenceAsync(CombatAction action)
+        {
+            if (action.IsPlayerAction)
+                return await PlayPlayerAttackSequenceAsync(action);
+            else
+                return await PlayEnemyAttackSequenceAsync(action);
+        }
+    public async Task<bool> PlayPlayerAttackSequenceAsync(CombatAction action)
     {
-        Vector2 playerStart = PlayerVisual != null ? PlayerVisual.Position : Vector2.Zero;
-        Vector2 enemyStart  = EnemyVisual != null ? EnemyVisual.Position : Vector2.Zero;
+        // Use the cached home position, not the live position!
+        Vector2 enemyTarget = _enemyHomePos;
 
         if (PlayerVisual != null && EnemyVisual != null)
         {
-            Vector2 attackSpot = enemyStart + new Vector2(-70f, 0f);
+            Vector2 attackSpot = enemyTarget + new Vector2(-70f, 0f);
             var lungeTween = CreateTween();
             lungeTween.TweenProperty(PlayerVisual, "position", attackSpot, action.StrikeSeconds)
                       .SetTrans(Tween.TransitionType.Sine)
@@ -168,22 +197,20 @@ public partial class CombatScene : Node2D
             if (action.EnemyWillJump)
             {
                 double jumpDelay = Mathf.Max(0.05, action.StrikeSeconds - JumpAscentTime);
-                _ = TriggerDelayedNodeJumpAsync(EnemyVisual, enemyStart, jumpDelay);
+                // Use the cached _enemyHomePos to guarantee it lands back on the ground
+                _ = TriggerDelayedNodeJumpAsync(EnemyVisual, _enemyHomePos, jumpDelay);
             }
 
             await ToSignal(lungeTween, Tween.SignalName.Finished);
         }
-        else
-        {
-            await ToSignal(GetTree().CreateTimer(action.StrikeSeconds), SceneTreeTimer.SignalName.Timeout);
-        }
 
         bool dodged = action.EnemyWillJump;
 
+        // Return player to exact starting spot
         if (PlayerVisual != null)
         {
             var returnTween = CreateTween();
-            returnTween.TweenProperty(PlayerVisual, "position", playerStart, 0.35f)
+            returnTween.TweenProperty(PlayerVisual, "position", _playerHomePos, 0.35f)
                        .SetTrans(Tween.TransitionType.Quad)
                        .SetEase(Tween.EaseType.Out);
             await ToSignal(returnTween, Tween.SignalName.Finished);
@@ -192,14 +219,12 @@ public partial class CombatScene : Node2D
         return dodged;
     }
 
+    // ─── ENEMY ATTACKS PLAYER ─────────────────────────────────────────────
     private async Task<bool> PlayEnemyAttackSequenceAsync(CombatAction action)
     {
-        Vector2 enemyStart  = EnemyVisual != null ? EnemyVisual.Position : Vector2.Zero;
-        Vector2 playerStart = PlayerVisual != null ? PlayerVisual.Position : Vector2.Zero;
-
         if (_jumpCueRoot != null)
         {
-            _jumpCueRoot.Position = playerStart + new Vector2(0, -110f);
+            _jumpCueRoot.Position = _playerHomePos + new Vector2(0, -110f);
             _jumpCueRoot.Scale = Vector2.One;
             _barFill.Size = new Vector2(0, BarHeight - 4);
             _barSweetSpot.Visible = action.CanBeJumped;
@@ -211,17 +236,14 @@ public partial class CombatScene : Node2D
 
         float windup = action.WindupSeconds;
         float strike = action.StrikeSeconds;
-        float totalTime = windup + strike;
 
         Tween barTween = null;
         if (_barFill != null)
         {
             float windupWidth = BarTotalWidth * 0.66f;
             barTween = CreateTween();
-            barTween.TweenProperty(_barFill, "size:x", windupWidth, windup)
-                    .SetTrans(Tween.TransitionType.Linear);
-            barTween.TweenProperty(_barFill, "size:x", BarTotalWidth, strike)
-                    .SetTrans(Tween.TransitionType.Linear);
+            barTween.TweenProperty(_barFill, "size:x", windupWidth, windup).SetTrans(Tween.TransitionType.Linear);
+            barTween.TweenProperty(_barFill, "size:x", BarTotalWidth, strike).SetTrans(Tween.TransitionType.Linear);
         }
 
         if (action.CanBeJumped)
@@ -235,17 +257,17 @@ public partial class CombatScene : Node2D
             _barFill.Color = new Color(0.9f, 0.2f, 0.2f, 0.95f);
         }
 
-        Vector2 windupSpot = enemyStart.Lerp(playerStart + new Vector2(70f, 0f), 0.45f);
+        // Play the enemy's body animation (windup)
+        string animName = "attack_" + action.EnemyAttack.ToString().ToLower();
+        PlayEnemyAnim(animName);
 
+        // Make the enemy flash yellow for the windup
         if (EnemyVisual != null)
         {
-            var stepOutTween = CreateTween();
-            stepOutTween.TweenProperty(EnemyVisual, "position", windupSpot, windup * 0.6f)
-                        .SetTrans(Tween.TransitionType.Quad)
-                        .SetEase(Tween.EaseType.Out);
-            stepOutTween.TweenProperty(EnemyVisual, "modulate", new Color(1.4f, 1.3f, 0.5f), windup * 0.2f);
-            stepOutTween.TweenProperty(EnemyVisual, "modulate", Colors.White, windup * 0.2f);
-            await ToSignal(stepOutTween, Tween.SignalName.Finished);
+            var flashTween = CreateTween();
+            flashTween.TweenProperty(EnemyVisual, "modulate", new Color(1.4f, 1.3f, 0.5f), windup * 0.5f);
+            flashTween.TweenProperty(EnemyVisual, "modulate", Colors.White, windup * 0.5f);
+            await ToSignal(GetTree().CreateTimer(windup), SceneTreeTimer.SignalName.Timeout);
         }
         else
         {
@@ -264,21 +286,46 @@ public partial class CombatScene : Node2D
             pulseTween.TweenProperty(_jumpCueRoot, "scale", Vector2.One, 0.1f);
         }
 
-        if (EnemyVisual != null && PlayerVisual != null)
+        // ─── THE ATTACK EFFECT MOVES TOWARD THE PLAYER ───
+        if (EnemyAttackEffect != null)
         {
-            EnemyVisual.Modulate = new Color(1.5f, 0.6f, 0.5f);
+            // 1. Determine which animation to play based on the attack type
+            // (e.g., EnemyAttacksType.Fire becomes "attack_fire")
+            string effectAnimName = "attack_" + action.EnemyAttack.ToString().ToLower();
+            
+            // 2. Play the animation safely
+            if (EnemyAttackEffect.SpriteFrames != null && EnemyAttackEffect.SpriteFrames.HasAnimation(effectAnimName))
+            {
+                EnemyAttackEffect.Play(effectAnimName);
+            }
+            else
+            {
+                GD.PrintErr($"Missing animation '{effectAnimName}' on EnemyAttackEffect!");
+            }
 
-            Vector2 strikeSpot = playerStart + new Vector2(55f, 0f);
-            var rushTween = CreateTween();
-            rushTween.TweenProperty(EnemyVisual, "position", strikeSpot, strike)
-                     .SetTrans(Tween.TransitionType.Back)
-                     .SetEase(Tween.EaseType.In);
+            // 3. Spawn slightly to the LEFT of the enemy (adjust -40f as needed)
+            Vector2 spawnOffset = new Vector2(-90f, 0f); 
+            EnemyAttackEffect.Position = _enemyHomePos + spawnOffset;
+            EnemyAttackEffect.Visible = true;
+            
+            // 4. Target slightly to the RIGHT of the player's center (adjust +20f as needed)
+            Vector2 targetOffset = new Vector2(20f, 0f);
+            Vector2 targetPos = _playerHomePos + targetOffset;
+            
+            // 5. Tween the EFFECT toward the player
+            var effectTween = CreateTween();
+            effectTween.TweenProperty(EnemyAttackEffect, "position", targetPos, strike)
+                       .SetTrans(Tween.TransitionType.Back)
+                       .SetEase(Tween.EaseType.In);
 
-            await ToSignal(rushTween, Tween.SignalName.Finished);
-            EnemyVisual.Modulate = Colors.White;
-        }
+            await ToSignal(effectTween, Tween.SignalName.Finished);
+            
+            // 6. Hide the effect when it hits
+            EnemyAttackEffect.Visible = false;
+        } 
         else
         {
+            // Fallback if no effect is assigned
             await ToSignal(GetTree().CreateTimer(strike), SceneTreeTimer.SignalName.Timeout);
         }
 
@@ -297,24 +344,16 @@ public partial class CombatScene : Node2D
             ShowCueFeedback("HIT!", new Color(1f, 0.25f, 0.25f));
             if (PlayerVisual != null)
             {
-                // Brief red hit-flash on player
                 var hitFlash = CreateTween();
                 hitFlash.TweenProperty(PlayerVisual, "modulate", new Color(1.6f, 0.4f, 0.4f), 0.12f);
                 hitFlash.TweenProperty(PlayerVisual, "modulate", Colors.White, 0.15f);
             }
         }
 
-        // Brief pause at impact before enemy walks back
         await ToSignal(GetTree().CreateTimer(0.35), SceneTreeTimer.SignalName.Timeout);
 
-        if (EnemyVisual != null)
-        {
-            var returnTween = CreateTween();
-            returnTween.TweenProperty(EnemyVisual, "position", enemyStart, 0.50f)
-                       .SetTrans(Tween.TransitionType.Quad)
-                       .SetEase(Tween.EaseType.Out);
-            await ToSignal(returnTween, Tween.SignalName.Finished);
-        }
+        // Reset enemy body animation back to idle
+        PlayEnemyAnim("idle");
 
         if (_jumpCueRoot != null)
             _jumpCueRoot.Visible = false;
@@ -336,8 +375,7 @@ public partial class CombatScene : Node2D
 
         if (PlayerVisual != null)
         {
-            Vector2 groundPos = PlayerVisual.Position;
-            await AnimateJumpArcAsync(PlayerVisual, groundPos);
+            await AnimateJumpArcAsync(PlayerVisual, _playerHomePos);
         }
         else
         {
@@ -370,21 +408,25 @@ public partial class CombatScene : Node2D
         await ToSignal(downTween, Tween.SignalName.Finished);
     }
 
+    private void PlayEnemyAnim(string animName)
+    {
+        if (_enemySprite == null || _enemySprite.SpriteFrames == null) return;
+        
+        if (_enemySprite.SpriteFrames.HasAnimation(animName))
+            _enemySprite.Play(animName);
+        else if (_enemySprite.SpriteFrames.HasAnimation("idle"))
+            _enemySprite.Play("idle");
+    }
+
     private void WireButton(string nodeName, PlayerAttacksType type)
     {
         if (AttackButtons == null) return;
-
         var btn = AttackButtons.GetNodeOrNull<Button>(nodeName);
         if (btn != null)
         {
             btn.Pressed += () =>
             {
-                var action = new CombatAction
-                {
-                    IsPlayerAction = true,
-                    AttackName = type.ToString(),
-                    PlayerAttack = type
-                };
+                var action = new CombatAction { IsPlayerAction = true, AttackName = type.ToString(), PlayerAttack = type };
                 _manager.PlayerActionSelected(action);
             };
         }
@@ -407,18 +449,9 @@ public partial class CombatScene : Node2D
     {
         PlayerHPBar.MaxValue = pMax;
         PlayerHPBar.Value = p;
-
-        if (PlayerMPBar != null)
-        {
-            PlayerMPBar.MaxValue = pMaxMp;
-            PlayerMPBar.Value = pMp;
-            //PlayerMPLabel.Text = $"MP: {pMp} / {pMaxMp}";
-        }
-
+        //if (PlayerMPBar != null) { PlayerMPBar.MaxValue = pMaxMp; PlayerMPBar.Value = pMp; }
         EnemyHPBar.MaxValue = eMax;
         EnemyHPBar.Value = e;
-
-        //PlayerHPLabel.Text = $"HP: {p} / {pMax}";
         EnemyHPLabel.Text = $"Enemy: {e} / {eMax}";
     }
 
@@ -427,7 +460,6 @@ public partial class CombatScene : Node2D
     private void SetButtonsEnabled(bool enabled)
     {
         if (AttackButtons == null) return;
-
         Button firstButton = null;
         foreach (var c in AttackButtons.GetChildren())
         {
@@ -437,8 +469,6 @@ public partial class CombatScene : Node2D
                 if (enabled && firstButton == null) firstButton = b;
             }
         }
-
-        if (enabled && firstButton != null)
-            firstButton.CallDeferred("grab_focus");
+        if (enabled && firstButton != null) firstButton.CallDeferred("grab_focus");
     }
 }

@@ -2,8 +2,10 @@
 
 [ext_resource type="Script" uid="uid://c8hdyntk0qg5e" path="res://Scripts/utility/Battle/CombatScene.cs" id="1_7uj85"]
 [ext_resource type="Texture2D" uid="uid://c46dib6a803l4" path="res://Assets/Map/Tiled_files/Fondo 3.png" id="2_2ip8y"]
-[ext_resource type="Texture2D" uid="uid://bcgp1trpmf0kx" path="res://Assets/Player/Manpel_V1.png" id="4_2ip8y"]
+[ext_resource type="Texture2D" uid="uid://b00bqpt4shna3" path="res://Assets/Player/Manpel_MirandoDerecha_Izquierda_V1.png" id="4_sv7pb"]
 [ext_resource type="Script" uid="uid://bu56o0orcqamk" path="res://Scripts/utility/Battle/CombatManager.cs" id="5_2ip8y"]
+[ext_resource type="Texture2D" uid="uid://ch6kesl1afh23" path="res://Assets/Enemies/pitagma/Bola-de-Fuego.png" id="5_cy4jt"]
+[ext_resource type="Texture2D" uid="uid://bqrembje16p1x" path="res://Assets/Enemies/pitagma/Explosion.png" id="5_sv7pb"]
 [ext_resource type="Texture2D" uid="uid://dkphdmvvl47h" path="res://Assets/Enemies/pitagma/Pitagma_V1.png" id="5_vtehv"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_2ip8y"]
@@ -13,11 +15,11 @@ outline_color = Color(0, 0, 0, 1)
 shadow_size = 3
 shadow_color = Color(0, 0, 0, 0.26666668)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_2ip8y"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_loea4"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("4_2ip8y")
+"texture": ExtResource("4_sv7pb")
 }],
 "loop": 1,
 "name": &"default",
@@ -31,15 +33,35 @@ animations = [{
 "texture": ExtResource("5_vtehv")
 }],
 "loop": 1,
-"name": &"new_animation",
+"name": &"idle",
 "speed": 5.0
 }]
 
-[node name="CombatScene" type="Node2D" unique_id=422745843 node_paths=PackedStringArray("MessageLabel", "PlayerHPBar", "EnemyHPBar", "EnemyHPLabel", "AttackButtons", "OutcomePanel", "OutcomeTitle", "ContinueButton", "PlayerVisual", "EnemyVisual")]
+[sub_resource type="SpriteFrames" id="SpriteFrames_2ip8y"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_sv7pb")
+}],
+"loop": 1,
+"name": &"attack_explosion",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_cy4jt")
+}],
+"loop": 1,
+"name": &"attack_fire",
+"speed": 5.0
+}]
+
+[node name="CombatScene" type="Node2D" unique_id=422745843 node_paths=PackedStringArray("MessageLabel", "PlayerHPBar", "EnemyHPBar", "PlayerHPLabel", "EnemyHPLabel", "AttackButtons", "OutcomePanel", "OutcomeTitle", "ContinueButton", "PlayerVisual", "EnemyVisual", "EnemyAttackEffect")]
 script = ExtResource("1_7uj85")
 MessageLabel = NodePath("UI/MessageLabel")
 PlayerHPBar = NodePath("UI/PlayerHpBar")
 EnemyHPBar = NodePath("UI/EnemyHpBar")
+PlayerHPLabel = NodePath("UI/PlayerHpLabel")
 EnemyHPLabel = NodePath("UI/EnemyHpLabel")
 AttackButtons = NodePath("UI/AttackButtons")
 OutcomePanel = NodePath("UI/OutComePanel")
@@ -47,6 +69,7 @@ OutcomeTitle = NodePath("UI/OutComePanel/OutComeTitle")
 ContinueButton = NodePath("UI/OutComePanel/ContinueButton")
 PlayerVisual = NodePath("Player")
 EnemyVisual = NodePath("Enemy")
+EnemyAttackEffect = NodePath("fire")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1841624582]
 position = Vector2(303, 44.435)
@@ -205,15 +228,22 @@ color = Color(0.11119685, 0.11119684, 0.11119684, 0.14509805)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2073225230]
 position = Vector2(306, 50)
-zoom = Vector2(1.025, 1.025)
+zoom = Vector2(0.855, 0.855)
 
 [node name="Player" type="AnimatedSprite2D" parent="." unique_id=381579043]
 position = Vector2(-13, 89.000015)
 scale = Vector2(0.665, 0.665)
-sprite_frames = SubResource("SpriteFrames_2ip8y")
+sprite_frames = SubResource("SpriteFrames_loea4")
 
 [node name="Enemy" type="AnimatedSprite2D" parent="." unique_id=2006807027]
-position = Vector2(675, 89.99999)
+position = Vector2(746, -1.0000076)
 scale = Vector2(0.755, 0.755)
 sprite_frames = SubResource("SpriteFrames_7uj85")
-animation = &"new_animation"
+animation = &"idle"
+autoplay = "idle"
+
+[node name="fire" type="AnimatedSprite2D" parent="." unique_id=1742816955]
+position = Vector2(412, 25)
+scale = Vector2(0.25750002, 0.33805558)
+sprite_frames = SubResource("SpriteFrames_2ip8y")
+animation = &"attack_explosion"

@@ -158,8 +158,6 @@ public partial class CombatManager : Node
             action.StrikeSeconds = profile.StrikeSeconds;
             action.Damage = CalculateEnemyDamage(profile.BaseDamage);
 
-            string jumpHint = action.CanBeJumped ? " Watch the timing bar to JUMP!" : " Brace yourself!";
-            EmitSignal(SignalName.MessageUpdated, $"{_enemyDef.DisplayName} prepares {action.AttackName}!{jumpHint}");
         }
 
         // Play the visual sequence (Jump logic happens inside here)

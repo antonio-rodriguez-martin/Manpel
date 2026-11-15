@@ -27,7 +27,7 @@ metadata/_custom_type_script = "uid://c5pnqrdfwvh5v"
 script = ExtResource("2_afpow")
 DisplayName = "Pitagma"
 SpriteRef = ExtResource("5_0830c")
-MaxHP = 1
+MaxHP = 40
 Attacks = SubResource("Resource_afpow")
 metadata/_custom_type_script = "uid://dvk8o2hy13oou"
 
