@@ -8,8 +8,8 @@ public partial class CombatScene : Node2D
     [Export] public ProgressBar PlayerHPBar;
     [Export] public ProgressBar PlayerMPBar;
     [Export] public ProgressBar EnemyHPBar;
-    [Export] public Label PlayerHPLabel;
-    [Export] public Label PlayerMPLabel;
+    //[Export] public Label PlayerHPLabel;
+    //[Export] public Label PlayerMPLabel;
     [Export] public Label EnemyHPLabel;
     [Export] public Container AttackButtons;
 
@@ -23,7 +23,8 @@ public partial class CombatScene : Node2D
     [Export] public float JumpAscentTime = 0.22f;
     [Export] public float JumpHangTime = 0.30f;
     [Export] public float JumpDescentTime = 0.22f;
-
+    
+    private int JumpNum;
     private CombatManager _manager;
 
     // Player Jump-Dodge state
@@ -32,7 +33,7 @@ public partial class CombatScene : Node2D
     private bool _isPlayerJumping = false;
     private bool _isPlayerAirborne = false;
 
-    // Auto-generated Visual Timing Cue UI above Player
+    //Visual salto
     private Node2D _jumpCueRoot;
     private Label _jumpCueLabel;
     private ColorRect _barBg;
@@ -69,7 +70,7 @@ public partial class CombatScene : Node2D
 
     public override void _Process(double delta)
     {
-        if (_canPlayerJump && !_isPlayerJumping && Input.IsActionJustPressed("ui_accept"))
+        if (_canPlayerJump && !_isPlayerJumping && Input.IsActionJustPressed("ui_accept") && JumpNum > 0)
         {
             if (!_isJumpWindowSweetSpot)
             {
@@ -81,10 +82,10 @@ public partial class CombatScene : Node2D
             }
 
             _ = PerformPlayerJumpAsync();
+            JumpNum = 0;
         }
     }
 
-    // ─── Visual Jump Timing Indicator Setup ──────────────────────────────
     private void CreateJumpTimingIndicator()
     {
         _jumpCueRoot = new Node2D
@@ -123,7 +124,6 @@ public partial class CombatScene : Node2D
         };
         _jumpCueRoot.AddChild(_barFill);
 
-        // Floating Prompt Label ("! WAIT..." -> "★ JUMP! [SPACE] ★")
         _jumpCueLabel = new Label
         {
             Text = "! WAIT...",
@@ -144,7 +144,6 @@ public partial class CombatScene : Node2D
         _jumpCueLabel.AddThemeColorOverride("font_color", color);
     }
 
-    // ─── Attack Sequences ────────────────────────────────────────────────
     public async Task<bool> PlayAttackSequenceAsync(CombatAction action)
     {
         if (action.IsPlayerAction)
@@ -198,7 +197,6 @@ public partial class CombatScene : Node2D
         Vector2 enemyStart  = EnemyVisual != null ? EnemyVisual.Position : Vector2.Zero;
         Vector2 playerStart = PlayerVisual != null ? PlayerVisual.Position : Vector2.Zero;
 
-        // Position the visual timing indicator above the player's head
         if (_jumpCueRoot != null)
         {
             _jumpCueRoot.Position = playerStart + new Vector2(0, -110f);
@@ -215,7 +213,6 @@ public partial class CombatScene : Node2D
         float strike = action.StrikeSeconds;
         float totalTime = windup + strike;
 
-        // Start filling the timing bar across the full attack duration (windup + strike)
         Tween barTween = null;
         if (_barFill != null)
         {
@@ -227,7 +224,6 @@ public partial class CombatScene : Node2D
                     .SetTrans(Tween.TransitionType.Linear);
         }
 
-        // ─── PHASE 1: Wind-Up (Enemy steps out to center & telegraphs) ───
         if (action.CanBeJumped)
         {
             ShowCueFeedback("! WAIT...", new Color(1f, 0.85f, 0.2f));
@@ -244,7 +240,6 @@ public partial class CombatScene : Node2D
         if (EnemyVisual != null)
         {
             var stepOutTween = CreateTween();
-            // Step forward for 60% of windup, then shake/flash yellow for 40% of windup
             stepOutTween.TweenProperty(EnemyVisual, "position", windupSpot, windup * 0.6f)
                         .SetTrans(Tween.TransitionType.Quad)
                         .SetEase(Tween.EaseType.Out);
@@ -257,7 +252,6 @@ public partial class CombatScene : Node2D
             await ToSignal(GetTree().CreateTimer(windup), SceneTreeTimer.SignalName.Timeout);
         }
 
-        // ─── PHASE 2: Strike & Jump Sweet-Spot Window ("JUMP NOW!") ──────
         _isJumpWindowSweetSpot = true;
 
         if (action.CanBeJumped && !_isPlayerJumping)
@@ -265,7 +259,6 @@ public partial class CombatScene : Node2D
             ShowCueFeedback("★ JUMP! [SPACE] ★", new Color(0.2f, 1f, 0.35f));
             _barFill.Color = new Color(0.2f, 1f, 0.35f, 1f);
 
-            // Pulse the indicator so it catches the player's eye
             var pulseTween = CreateTween();
             pulseTween.TweenProperty(_jumpCueRoot, "scale", new Vector2(1.18f, 1.18f), 0.1f);
             pulseTween.TweenProperty(_jumpCueRoot, "scale", Vector2.One, 0.1f);
@@ -273,7 +266,6 @@ public partial class CombatScene : Node2D
 
         if (EnemyVisual != null && PlayerVisual != null)
         {
-            // Flash the enemy bright orange-red as they lunge
             EnemyVisual.Modulate = new Color(1.5f, 0.6f, 0.5f);
 
             Vector2 strikeSpot = playerStart + new Vector2(55f, 0f);
@@ -290,7 +282,6 @@ public partial class CombatScene : Node2D
             await ToSignal(GetTree().CreateTimer(strike), SceneTreeTimer.SignalName.Timeout);
         }
 
-        // ─── PHASE 3: Impact Check & Recovery ────────────────────────────
         _canPlayerJump = false;
         _isJumpWindowSweetSpot = false;
         barTween?.Kill();
@@ -328,6 +319,7 @@ public partial class CombatScene : Node2D
         if (_jumpCueRoot != null)
             _jumpCueRoot.Visible = false;
 
+        JumpNum = 1;
         return playerDodged;
     }
 
@@ -393,7 +385,7 @@ public partial class CombatScene : Node2D
                     AttackName = type.ToString(),
                     PlayerAttack = type
                 };
-                _manager.ExecuteAction(action);
+                _manager.PlayerActionSelected(action);
             };
         }
     }
@@ -420,13 +412,13 @@ public partial class CombatScene : Node2D
         {
             PlayerMPBar.MaxValue = pMaxMp;
             PlayerMPBar.Value = pMp;
-            PlayerMPLabel.Text = $"MP: {pMp} / {pMaxMp}";
+            //PlayerMPLabel.Text = $"MP: {pMp} / {pMaxMp}";
         }
 
         EnemyHPBar.MaxValue = eMax;
         EnemyHPBar.Value = e;
 
-        PlayerHPLabel.Text = $"HP: {p} / {pMax}";
+        //PlayerHPLabel.Text = $"HP: {p} / {pMax}";
         EnemyHPLabel.Text = $"Enemy: {e} / {eMax}";
     }
 

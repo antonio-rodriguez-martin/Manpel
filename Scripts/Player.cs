@@ -51,16 +51,21 @@ public partial class Player : GridMover
 
     private void OnMoveCompleted() => TurnManager.Instance.StartEnemyTurn();
 
-   public override bool OnMoveIntercepted(Vector2 targetWorldPos)
+
+    public override bool OnMoveIntercepted(Vector2 targetWorldPos)
+{
+    // FindEnemyAt will return null if there are no enemies on the map
+    Enemy1 enemy = FindEnemyAt(targetWorldPos);
+    if (enemy != null)
     {
-        Enemy1 enemy = FindEnemyAt(targetWorldPos);
-        if (enemy != null)
-        {
-            CombatTransition.Instance.StartBattle(this, enemy);
-            return true; 
-        }
-        return false;
-    } 
+        // If an enemy is here, start the battle and stop moving
+        CombatTransition.Instance.StartBattle(this, enemy);
+        return true; 
+    }
+    
+    // If there are no enemies, return false so the player keeps moving
+    return false; 
+}
 
     private Enemy1 FindEnemyAt(Vector2 worldPos)
     {
