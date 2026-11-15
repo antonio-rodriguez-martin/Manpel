@@ -33,6 +33,10 @@ project/assembly_name="Manpel"
 
 version_control/autoload_on_startup=true
 
+[global_group]
+
+player=""
+
 [input]
 
 ui_left={

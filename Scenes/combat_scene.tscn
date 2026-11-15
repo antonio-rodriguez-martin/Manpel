@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://clfaegfqu1msj"]
 
 [ext_resource type="Script" uid="uid://c8hdyntk0qg5e" path="res://Scripts/utility/Battle/CombatScene.cs" id="1_7uj85"]
-[ext_resource type="Texture2D" uid="uid://g5qt7o1xe6mt" path="res://Assets/Map/Tiled_files/battleBackground.jpg" id="2_2ip8y"]
+[ext_resource type="Texture2D" uid="uid://c46dib6a803l4" path="res://Assets/Map/Tiled_files/Fondo 3.png" id="2_2ip8y"]
 [ext_resource type="Texture2D" uid="uid://bcgp1trpmf0kx" path="res://Assets/Player/Manpel_V1.png" id="4_2ip8y"]
 [ext_resource type="Script" uid="uid://bu56o0orcqamk" path="res://Scripts/utility/Battle/CombatManager.cs" id="5_2ip8y"]
 [ext_resource type="Texture2D" uid="uid://dkphdmvvl47h" path="res://Assets/Enemies/pitagma/Pitagma_V1.png" id="5_vtehv"]
@@ -50,7 +50,7 @@ EnemyVisual = NodePath("Enemy")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1841624582]
 position = Vector2(303, 44.435)
-scale = Vector2(0.485, 0.485)
+scale = Vector2(1.95, 1.95)
 texture = ExtResource("2_2ip8y")
 metadata/_edit_lock_ = true
 
@@ -208,14 +208,12 @@ position = Vector2(306, 50)
 zoom = Vector2(1.025, 1.025)
 
 [node name="Player" type="AnimatedSprite2D" parent="." unique_id=381579043]
-position = Vector2(-57.999985, 160)
-scale = Vector2(0.24, 0.24)
+position = Vector2(-13, 89.000015)
+scale = Vector2(0.665, 0.665)
 sprite_frames = SubResource("SpriteFrames_2ip8y")
-metadata/_edit_lock_ = true
 
 [node name="Enemy" type="AnimatedSprite2D" parent="." unique_id=2006807027]
-position = Vector2(700, 155.99998)
-scale = Vector2(0.47, 0.47)
+position = Vector2(675, 89.99999)
+scale = Vector2(0.755, 0.755)
 sprite_frames = SubResource("SpriteFrames_7uj85")
 animation = &"new_animation"
-metadata/_edit_lock_ = true

@@ -6,6 +6,13 @@
 [ext_resource type="Script" uid="uid://c5pnqrdfwvh5v" path="res://Resources/DataDefinition/AttacksDefinitionResource.cs" id="3_52ee3"]
 [ext_resource type="Texture2D" uid="uid://bsaoflm5daf4j" path="res://Assets/Player/Manpel_Mirando_Abajo_Derecha_Splash_V1.png" id="3_gntrk"]
 [ext_resource type="Script" uid="uid://cqodmjbr84dfo" path="res://Resources/DataDefinition/PlayerDefinitionData.cs" id="4_bhhdu"]
+[ext_resource type="Texture2D" uid="uid://bojsk2lw3om7m" path="res://Assets/Player/Manpel_Mirando_Abajo_Derecha_V1.png" id="5_glx4g"]
+[ext_resource type="Texture2D" uid="uid://csks7ht5da2w" path="res://Assets/Player/Manpel_MirandoArriba_Derecha_Splash_V1.png" id="5_yoq75"]
+[ext_resource type="Texture2D" uid="uid://dm0y7xbbeaoix" path="res://Assets/Player/Manpel_MirandoArriba_Derecha_V1.png" id="6_ksbbd"]
+[ext_resource type="Texture2D" uid="uid://b6lcy41ja05rp" path="res://Assets/Player/Manpel_MirandoDerecha_Derecha_V1.png" id="13_o3h8g"]
+[ext_resource type="Texture2D" uid="uid://cp76pivq3gg4b" path="res://Assets/Player/Manpel_MirandoDerecha_Izquierda_Splash_V1.png" id="14_1e7my"]
+[ext_resource type="Texture2D" uid="uid://bm5nkwyh28h2i" path="res://Assets/Player/Manpel_Mirando_Izquierda_Derecha_V1.png" id="15_arntx"]
+[ext_resource type="Texture2D" uid="uid://c4v0dp8ljvgqi" path="res://Assets/Player/Manpel_Mirando_Izquierda_Derecha_Splash_V1.png" id="16_lslt6"]
 
 [sub_resource type="Resource" id="Resource_52ee3"]
 script = ExtResource("2_nn08x")
@@ -37,6 +44,50 @@ height = 18.761457
 [sub_resource type="SpriteFrames" id="SpriteFrames_rpqav"]
 animations = [{
 "frames": [{
+"duration": 1.6,
+"texture": ExtResource("5_glx4g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_gntrk")
+}],
+"loop": 1,
+"name": &"caminar_down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_arntx")
+}, {
+"duration": 1.5,
+"texture": ExtResource("16_lslt6")
+}],
+"loop": 1,
+"name": &"caminar_left_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_o3h8g")
+}, {
+"duration": 1.5,
+"texture": ExtResource("14_1e7my")
+}],
+"loop": 1,
+"name": &"caminar_side",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_yoq75")
+}, {
+"duration": 1.5,
+"texture": ExtResource("6_ksbbd")
+}],
+"loop": 1,
+"name": &"caminar_up",
+"speed": 5.0
+}, {
+"frames": [{
 "duration": 1.0,
 "texture": ExtResource("2_kyqiw")
 }, {
@@ -44,31 +95,144 @@ animations = [{
 "texture": ExtResource("3_gntrk")
 }],
 "loop": 1,
-"name": &"Idle",
+"name": &"idle",
 "speed": 2.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"default",
-"speed": 5.0
 }]
 
-[node name="Player" type="CharacterBody2D" unique_id=1657417588 node_paths=PackedStringArray("AnimSprite")]
+[sub_resource type="Animation" id="Animation_nn08x"]
+resource_name = "CaminarAbaji"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.17770861, 0.34330073, 0.4927375),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.35541722, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_52ee3"]
+resource_name = "CaminarArriba"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [1, 3, 4, 5]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(157.58646, 4705.0615, 132.51393),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-5.495, 0), Vector2(-0.19, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_bhhdu"]
+resource_name = "CaminarDerecha"
+
+[sub_resource type="Animation" id="Animation_megsn"]
+resource_name = "Idle"
+
+[sub_resource type="Animation" id="Animation_yoq75"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-5.495, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yoq75"]
+_data = {
+&"CaminarAbajo": SubResource("Animation_nn08x"),
+&"CaminarArriba": SubResource("Animation_52ee3"),
+&"CaminarDerecha": SubResource("Animation_bhhdu"),
+&"Idle": SubResource("Animation_megsn"),
+&"RESET": SubResource("Animation_yoq75")
+}
+
+[node name="Player" type="CharacterBody2D" unique_id=1657417588 node_paths=PackedStringArray("camera", "Sprite")]
 z_index = 10
 scale = Vector2(2.645, 2.645)
 collision_layer = 2
 collision_mask = 9
 script = ExtResource("1_gntrk")
 Definition = SubResource("Resource_gntrk")
-AnimSprite = NodePath("AnimatedSprite2D")
+camera = NodePath("Camera2D")
+Sprite = NodePath("AnimatedSprite2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1214254715]
 scale = Vector2(1.33, 1.33)
 shape = SubResource("CapsuleShape2D_1cquo")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1025533183]
+position = Vector2(-5.495, 0)
 scale = Vector2(0.055, 0.055)
 sprite_frames = SubResource("SpriteFrames_rpqav")
-animation = &"Idle"
+animation = &"caminar_side"
+autoplay = "idle"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=656564996]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=414886586]
+libraries/ = SubResource("AnimationLibrary_yoq75")

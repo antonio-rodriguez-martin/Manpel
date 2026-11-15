@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cc8rokta0yhw3"
-path="res://.godot/imported/1_GetStartedinSeconds_std.webp-b4bf9fa02feb381f8ba37e1e56a08a7c.ctex"
+uid="uid://6aqv1uh4csm3"
+path="res://.godot/imported/Rocas.png-1012236f87b4e9b167e2d01100531167.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/1_GetStartedinSeconds_std.webp"
-dest_files=["res://.godot/imported/1_GetStartedinSeconds_std.webp-b4bf9fa02feb381f8ba37e1e56a08a7c.ctex"]
+source_file="res://Assets/Map/Tiled_files/Rocas.png"
+dest_files=["res://.godot/imported/Rocas.png-1012236f87b4e9b167e2d01100531167.ctex"]
 
 [params]
 

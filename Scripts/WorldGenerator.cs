@@ -1,58 +1,40 @@
 using Godot;
-using RuntimeDataSpace;
-using System;
 
 public partial class WorldGenerator : Node2D
 {
-    [Export] MapRegionResource[] regions;
-    [Export] AudioStreamPlayer SoundPlayer;
+    // Add this static instance
+    public static WorldGenerator Instance { get; private set; }
 
-    private int _currentRegionIndex = -1;
+    [Export] public MapRegionResource[] Regions;
 
-    /*
-    public void EnterRegion(int index)
+    public override void _EnterTree()
     {
-        if (index == _currentRegionIndex) return;
-        _currentRegionIndex = index;
+        Instance = this;
+    }
 
-         for (int i = 0; i < regions.Length; i++)
+    public void ApplyRegionSettings(int index, Player player, Vector2? spawnPosition = null)
+    {
+        if (index < 0 || index >= Regions.Length)
         {
-            regions[i].Visible = (i == index);
+            GD.PrintErr($"Region index {index} is out of bounds!");
+            return;
         }
 
-        var transition = GetNode<Transition>("/root/Transition");
-        GD.Print($"Transition found: {transition != null}");
-        GD.Print($"Overlay found: {transition.Overlay != null}");
-
-
-        _ = transition.TransitionToAsync(() =>
+        var region = Regions[index];
+        
+        if (spawnPosition.HasValue)
         {
-            if (regions[index].Music != null)
-            {
-                SoundPlayer.Stream = regions[index].Music;
-                SoundPlayer.Play();
-            }
-        });   
-    }   
-    */
-    public void EnterRegion(int index)
-    {
-        if (index == _currentRegionIndex) return;
-        _currentRegionIndex = index;
+            player.GlobalPosition = spawnPosition.Value;
+        }
 
-        var transition = GetNode<Transition>("/root/Transition");
-        GD.Print($"Transition found: {transition != null}");
-        GD.Print($"Overlay found: {transition.Overlay != null}");
-
-
-        _ = transition.TransitionToAsync(() =>
+        var camera = player.GetNodeOrNull<Camera2D>("Camera2D");
+        if (camera != null)
         {
-            if (regions[index].Music != null)
-            {
-                SoundPlayer.Stream = regions[index].Music;
-                SoundPlayer.Play();
-            }
-        });   
-    }   
-    
+            camera.LimitLeft = region.LimitLeft;
+            camera.LimitRight = region.LimitRight;
+            camera.LimitTop = region.LimitTop;
+            camera.LimitBottom = region.LimitBottom;
+            camera.ResetSmoothing(); 
+        }
+    }
 }
