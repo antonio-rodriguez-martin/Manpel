@@ -61,7 +61,7 @@ public static class CombatDatabase
             DisplayName = "Fire",
             BaseDamage = 8,
             CanBeJumped = true,
-            WindupSeconds = 1.25f,
+            WindupSeconds = 0.65f,
             StrikeSeconds = 0.50f
         },
         [EnemyAttacksType.Explosion] = new AttackProfile
@@ -69,7 +69,7 @@ public static class CombatDatabase
             DisplayName = "Explosion",
             BaseDamage = 20,
             CanBeJumped = false,
-            WindupSeconds = 1.20f,
+            WindupSeconds = 0.70f,
             StrikeSeconds = 0.60f
         }
     };

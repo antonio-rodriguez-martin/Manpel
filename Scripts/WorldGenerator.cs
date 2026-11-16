@@ -1,19 +1,40 @@
 using Godot;
-using RuntimeDataSpace;
-using System;
 
 public partial class WorldGenerator : Node2D
 {
-	[Export] MapRegionResource[] regions;
-	[Export] AudioStreamPlayer SoundPlayer;
+    // Add this static instance
+    public static WorldGenerator Instance { get; private set; }
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
+    [Export] public MapRegionResource[] Regions;
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
+    public override void _EnterTree()
+    {
+        Instance = this;
+    }
+
+    public void ApplyRegionSettings(int index, Player player, Vector2? spawnPosition = null)
+    {
+        if (index < 0 || index >= Regions.Length)
+        {
+            GD.PrintErr($"Region index {index} is out of bounds!");
+            return;
+        }
+
+        var region = Regions[index];
+        
+        if (spawnPosition.HasValue)
+        {
+            player.GlobalPosition = spawnPosition.Value;
+        }
+
+        var camera = player.GetNodeOrNull<Camera2D>("Camera2D");
+        if (camera != null)
+        {
+            camera.LimitLeft = region.LimitLeft;
+            camera.LimitRight = region.LimitRight;
+            camera.LimitTop = region.LimitTop;
+            camera.LimitBottom = region.LimitBottom;
+            camera.ResetSmoothing(); 
+        }
+    }
 }

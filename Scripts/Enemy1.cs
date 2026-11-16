@@ -3,11 +3,13 @@ using Godot;
 public partial class Enemy1 : GridMover
 {
     [Export] public EnemyDefinitionData enemyData;
-    public override void _Ready()
+     public override void _Ready()
     {
         AddToGroup("enemies");
         MoveCompleted += OnMoveCompleted;
-        TurnManager.Instance.EnemyTurnStarted += OnEnemyTurn;
+        
+        if (TurnManager.Instance != null)
+            TurnManager.Instance.EnemyTurnStarted += OnEnemyTurn;
     }
 
     public override bool OnMoveIntercepted(Vector2 targetWorldPos)
@@ -23,8 +25,11 @@ public partial class Enemy1 : GridMover
         return false;
     }
 
- private void OnEnemyTurn()
+     private void OnEnemyTurn()
     {
+        // Add a safety check just in case
+        if (!IsInsideTree() || IsQueuedForDeletion()) return;
+
         var player = RuntimeDataSpace.RuntimeData.player;
         if (player == null) { Finish(); return; }
 
@@ -36,10 +41,8 @@ public partial class Enemy1 : GridMover
 
         var dest = myCell + step;
 
-        // Reserve (see previous answer) then try to move.
         if (!TurnManager.Instance.ReservedCells.Add(dest)) { Finish(); return; }
 
-        // TryMove → OnMoveIntercepted fires → battle may start here.
         if (!TryMove(new Vector2(step.X, step.Y)))
             Finish(); 
     }
@@ -55,6 +58,16 @@ public partial class Enemy1 : GridMover
     private void Finish() => TurnManager.Instance.EnemyFinishedMoving();
     private void OnMoveCompleted() => Finish();
 
+    public void Die()
+        {
+            if (TurnManager.Instance != null)
+            {
+                // This prevents the ObjectDisposedException
+                TurnManager.Instance.EnemyTurnStarted -= OnEnemyTurn;
+            }
+            RemoveFromGroup("enemies");
+            QueueFree();
+        }
     public override void _ExitTree()
     {
         if (TurnManager.Instance != null)

@@ -1,0 +1,219 @@
+[gd_scene format=3 uid="uid://bgrig0uk3tpes"]
+
+[ext_resource type="Script" uid="uid://c8hdyntk0qg5e" path="res://Scripts/utility/Battle/CombatScene.cs" id="1_txy7r"]
+[ext_resource type="Texture2D" uid="uid://c46dib6a803l4" path="res://Assets/Map/Tiled_files/Fondo 3.png" id="2_vpfhl"]
+[ext_resource type="Script" uid="uid://bu56o0orcqamk" path="res://Scripts/utility/Battle/CombatManager.cs" id="3_qwaro"]
+[ext_resource type="Texture2D" uid="uid://b6lcy41ja05rp" path="res://Assets/Player/Manpel_MirandoDerecha_Derecha_V1.png" id="4_txy7r"]
+[ext_resource type="Texture2D" uid="uid://d3o1mv21enogh" path="res://Assets/Enemies/rambina/Rambiña_V1.png" id="5_txy7r"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_2ip8y"]
+font_size = 32
+font_color = Color(0.2920305, 0.5116851, 0.30252504, 1)
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.26666668)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2ip8y"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_txy7r")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7uj85"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_txy7r")
+}],
+"loop": 1,
+"name": &"new_animation",
+"speed": 5.0
+}]
+
+[node name="CombatScene" type="Node2D" unique_id=422745843 node_paths=PackedStringArray("MessageLabel", "PlayerHPBar", "EnemyHPBar", "PlayerHPLabel", "EnemyHPLabel", "AttackButtons", "OutcomePanel", "OutcomeTitle", "ContinueButton", "PlayerVisual", "EnemyVisual")]
+script = ExtResource("1_txy7r")
+MessageLabel = NodePath("UI/MessageLabel")
+PlayerHPBar = NodePath("UI/PlayerHpBar")
+EnemyHPBar = NodePath("UI/EnemyHpBar")
+PlayerHPLabel = NodePath("UI/PlayerHpLabel")
+EnemyHPLabel = NodePath("UI/EnemyHpLabel")
+AttackButtons = NodePath("UI/AttackButtons")
+OutcomePanel = NodePath("UI/OutComePanel")
+OutcomeTitle = NodePath("UI/OutComePanel/OutComeTitle")
+ContinueButton = NodePath("UI/OutComePanel/ContinueButton")
+PlayerVisual = NodePath("Player")
+EnemyVisual = NodePath("Enemy")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1841624582]
+position = Vector2(303, 44.435)
+scale = Vector2(1.95, 1.95)
+texture = ExtResource("2_vpfhl")
+metadata/_edit_lock_ = true
+
+[node name="CombatManager" type="Node" parent="." unique_id=1168859740]
+script = ExtResource("3_qwaro")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=2048058555]
+
+[node name="MessageLabel" type="Label" parent="UI" unique_id=1458159209]
+anchors_preset = -1
+anchor_left = 0.20400001
+anchor_top = 0.123
+anchor_right = 0.20400001
+anchor_bottom = 0.123
+offset_left = 159.99199
+offset_top = 55.295998
+offset_right = 507.992
+offset_bottom = 130.29599
+theme_override_font_sizes/font_size = 32
+text = "Banana is Watching you ... "
+label_settings = SubResource("LabelSettings_2ip8y")
+
+[node name="PlayerHpLabel" type="Label" parent="UI" unique_id=346643324]
+anchors_preset = -1
+anchor_left = 0.082
+anchor_top = 0.76000005
+anchor_right = 0.23200001
+anchor_bottom = 0.81900007
+offset_left = 1.5359955
+offset_top = -17.480042
+offset_right = 1.7360535
+offset_bottom = 21.287964
+theme_override_font_sizes/font_size = 32
+
+[node name="EnemyHpLabel" type="Label" parent="UI" unique_id=374897635]
+anchors_preset = -1
+anchor_left = 0.30100003
+anchor_top = 0.15
+anchor_right = 0.30100003
+anchor_bottom = 0.15
+offset_left = 534.2479
+offset_top = 411.8
+offset_right = 715.2479
+offset_bottom = 469.8
+theme_override_font_sizes/font_size = 32
+
+[node name="PlayerHpBar" type="ProgressBar" parent="UI" unique_id=1908079550]
+anchors_preset = -1
+anchor_left = -0.12200001
+anchor_top = 0.41500002
+anchor_right = 0.045
+anchor_bottom = 0.537
+offset_left = 214.544
+offset_top = 303.08
+offset_right = 241.16
+offset_bottom = 273.024
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 32
+
+[node name="EnemyHpBar" type="ProgressBar" parent="UI" unique_id=1430040751]
+anchors_preset = -1
+anchor_left = 0.30200002
+anchor_top = 0.17404935
+anchor_right = 0.42092362
+anchor_bottom = 0.20799997
+offset_left = 530.09595
+offset_top = 461.21603
+offset_right = 581.09595
+offset_bottom = 488.216
+theme_override_font_sizes/font_size = 32
+metadata/_edit_use_anchors_ = true
+
+[node name="AttackButtons" type="VBoxContainer" parent="UI" unique_id=1277082921]
+anchors_preset = -1
+anchor_top = 0.44400004
+anchor_bottom = 0.44400004
+offset_left = 329.0
+offset_top = 181.28796
+offset_right = 438.0
+offset_bottom = 282.28796
+grow_vertical = 0
+scale = Vector2(1.54, 1.54)
+metadata/_edit_use_anchors_ = true
+
+[node name="SeedButton" type="Button" parent="UI/AttackButtons" unique_id=1889354683]
+layout_mode = 2
+text = "Seed Attack
+
+"
+metadata/_edit_lock_ = true
+
+[node name="FireButton" type="Button" parent="UI/AttackButtons" unique_id=1397788251]
+layout_mode = 2
+text = "Fire Attack
+
+"
+metadata/_edit_lock_ = true
+
+[node name="WaterButton" type="Button" parent="UI/AttackButtons" unique_id=1242621705]
+layout_mode = 2
+text = "Water Attack
+
+"
+metadata/_edit_lock_ = true
+
+[node name="OutComePanel" type="Control" parent="UI" unique_id=2027235567]
+layout_mode = 3
+anchor_left = -0.043
+anchor_top = -0.18300001
+anchor_right = 0.18663195
+offset_left = 559.536
+offset_top = 541.584
+offset_right = 550.0
+offset_bottom = 575.5
+metadata/_edit_use_anchors_ = true
+
+[node name="OutComeTitle" type="Label" parent="UI/OutComePanel" unique_id=47152479]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5921569
+anchor_top = 0.603279
+anchor_right = 1.345098
+anchor_bottom = 0.9901642
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 32
+metadata/_edit_use_anchors_ = true
+
+[node name="ContinueButton" type="Button" parent="UI/OutComePanel" unique_id=1888521308]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.094333425
+anchor_top = 0.5834588
+anchor_right = 0.40033343
+anchor_bottom = 1.1144588
+offset_left = 5.944977
+offset_top = 25.022552
+offset_right = 5.914978
+offset_bottom = 25.044907
+theme_override_font_sizes/font_size = 32
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRect" type="ColorRect" parent="UI" unique_id=722117411]
+offset_left = 389.0
+offset_top = 117.0
+offset_right = 804.0
+offset_bottom = 202.0
+color = Color(0.11119685, 0.11119684, 0.11119684, 0.14509805)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=2073225230]
+position = Vector2(306, 50)
+zoom = Vector2(0.83, 0.83)
+
+[node name="Player" type="AnimatedSprite2D" parent="." unique_id=381579043]
+position = Vector2(-13, 89.000015)
+scale = Vector2(0.665, 0.665)
+sprite_frames = SubResource("SpriteFrames_2ip8y")
+
+[node name="Enemy" type="AnimatedSprite2D" parent="." unique_id=2006807027]
+position = Vector2(646, 195)
+sprite_frames = SubResource("SpriteFrames_7uj85")
+animation = &"new_animation"

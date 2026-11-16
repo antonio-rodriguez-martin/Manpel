@@ -18,6 +18,10 @@ config/icon="res://icon.svg"
 [autoload]
 
 CombatTransition="*uid://doy1xsxlf3lxp"
+Transition="*uid://cotdrueygqfpt"
+BossTransition="*uid://cbcawaled63x1"
+BossTrigger="*uid://cqeke3rb5q27e"
+MusicManager="*uid://xl6l3i3yqhce"
 
 [display]
 
@@ -31,6 +35,10 @@ project/assembly_name="Manpel"
 [editor]
 
 version_control/autoload_on_startup=true
+
+[global_group]
+
+player=""
 
 [input]
 

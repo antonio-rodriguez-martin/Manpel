@@ -45,32 +45,30 @@ public partial class CombatTransition : Node
         // 6. Setup the manager
         var manager = _combatLayer.GetNode<CombatManager>("CombatManager");
         manager.Setup(player.State, enemy);
+        MusicManager.Instance?.PlayCustomMusic();
     }
 
-    public void EndCombat(bool playerWon, Enemy1 mapEnemy)
+        public void EndCombat(bool playerWon, Enemy1 mapEnemy)
     {
-        // 1. Unpause and show the world
         _worldLayer.ProcessMode = Node.ProcessModeEnum.Inherit;
         _worldLayer.Visible = true; 
         
         var player = _worldLayer.GetNode<Player>("Player");
         if (player != null) player.CanMove = true;
         
-        // 2. Handle enemy death
         if (playerWon && IsInstanceValid(mapEnemy))
-            mapEnemy.QueueFree();
-
-        // 3. Delete the combat map
-        _combatLayer.QueueFree();
-        
-        // 4. Force the OVERWORLD camera to become active again
-        var worldCamera = _worldLayer.GetViewport().GetCamera2D();
-        if (worldCamera != null)
         {
-            worldCamera.MakeCurrent();
+            // CHANGED: Call Die() instead of QueueFree()
+            mapEnemy.Die(); 
         }
 
-        // 5. Reset turns
+        _combatLayer.QueueFree();
+        
+        var worldCamera = _worldLayer.GetViewport().GetCamera2D();
+        if (worldCamera != null) worldCamera.MakeCurrent();
+
         TurnManager.Instance?.ResetToPlayerTurn();
-    }
+
+        MusicManager.Instance?.StopCustomMusic();
+    } 
 }

@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://wqel1mxdgvin"]
+
+[ext_resource type="Script" uid="uid://csa7g0xuwn0rt" path="res://Scripts/signals/GameOver.cs" id="1_rc3hl"]
+[ext_resource type="Texture2D" uid="uid://d10wnd56js8v" path="res://Assets/victoria.png" id="2_rc3hl"]
+
+[node name="GameOver" type="CanvasLayer" unique_id=532341787]
+script = ExtResource("1_rc3hl")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1978909985]
+offset_right = 1154.0
+offset_bottom = 635.0
+texture = ExtResource("2_rc3hl")
+expand_mode = 2
+
+[node name="Label" type="Label" parent="." unique_id=1247458034]
+offset_left = 146.0
+offset_top = 554.0
+offset_right = 980.0
+offset_bottom = 644.0
+theme_override_colors/font_color = Color(0.20378119, 0.4018116, 0.67084086, 1)
+theme_override_font_sizes/font_size = 65
+text = "PRESS SPACE FOR RESTART"

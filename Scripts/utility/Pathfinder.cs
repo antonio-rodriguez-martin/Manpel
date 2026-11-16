@@ -4,8 +4,6 @@ using Godot;
 
 public static class Pathfinder
 {
-    /// Devuelve el primer paso desde el principio hacia el target
-    /// O Vector2I.Zero si no existe el path o ya está ahí
     public static Vector2I FindNextStep(
         Vector2I start,
         Vector2I goal,
@@ -17,8 +15,16 @@ public static class Pathfinder
         var queue = new Queue<Vector2I>();
         queue.Enqueue(start);
 
+        // ADD THIS: Limit how many tiles the enemy is allowed to search
+        int maxNodesToSearch = 500; 
+        int nodesSearched = 0;
+
         while (queue.Count > 0)
         {
+            // ADD THIS: If it searches too much, stop to prevent a memory leak
+            if (nodesSearched++ > maxNodesToSearch) 
+                return Vector2I.Zero; 
+
             var cur = queue.Dequeue();
 
             foreach (var d in GridMath.CardinalDirs)
@@ -26,7 +32,6 @@ public static class Pathfinder
                 var nxt = cur + d;
                 if (cameFrom.ContainsKey(nxt)) continue;
 
-                //Se choca con el jugador para entrar al combate
                 if (nxt != goal && isBlocked(nxt)) continue;
 
                 cameFrom[nxt] = cur;
